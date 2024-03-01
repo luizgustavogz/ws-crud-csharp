@@ -53,6 +53,7 @@
             txtNomePesquisar = new TextBox();
             cmdPesquisar = new Button();
             lstSexo = new ListBox();
+            txtID = new TextBox();
             ((System.ComponentModel.ISupportInitialize)grClientes).BeginInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
             SuspendLayout();
@@ -198,6 +199,7 @@
             mskCPF.Size = new Size(96, 23);
             mskCPF.TabIndex = 20;
             mskCPF.TextMaskFormat = MaskFormat.ExcludePromptAndLiterals;
+            mskCPF.Leave += new EventHandler(mskCPF_Leave);
             // 
             // cmdNovo
             // 
@@ -287,11 +289,20 @@
             lstSexo.TabIndex = 29;
             lstSexo.ValueMember = "sdadsa";
             // 
+            // txtID
+            // 
+            txtID.Location = new Point(377, 47);
+            txtID.Name = "txtID";
+            txtID.Size = new Size(100, 23);
+            txtID.TabIndex = 30;
+            txtID.Visible = false;
+            // 
             // frmCadastroClientes
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(533, 450);
+            Controls.Add(txtID);
             Controls.Add(lstSexo);
             Controls.Add(cmdPesquisar);
             Controls.Add(label8);
@@ -352,5 +363,6 @@
         private MaskedTextBox mskCPFPesquisar;
         private Label label7;
         private ListBox lstSexo;
+        private TextBox txtID;
     }
 }

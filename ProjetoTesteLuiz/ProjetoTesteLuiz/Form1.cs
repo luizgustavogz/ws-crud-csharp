@@ -92,6 +92,8 @@ namespace ProjetoTesteLuiz
         private void cmdNovo_Click(object sender, EventArgs e)
         {
             habilitarCampos();
+            limparCampos();
+            mskCPF.Focus();
         }
 
         private void cmdLimpar_Click(object sender, EventArgs e)
@@ -110,53 +112,57 @@ namespace ProjetoTesteLuiz
             try
             {
                 conn.Open();
-                string sql = "SELECT CPF FROM tblClientes WHERE CPF = @cpf";
-                cmd.CommandText = sql;
-                cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("@cpf", mskCPF.Text);
-                dtr = cmd.ExecuteReader();
-
-                if (dtr.HasRows)
+                string sql;
+                if (!string.IsNullOrEmpty(txtID.Text))
                 {
-                    MessageBox.Show("CPF já cadastrado", "Ops", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Atualização de um cliente existente
+                    sql = "UPDATE tblClientes SET Nome = @nome, CPF = @cpf, Telefone = @telefone, Sexo = @sexo, " +
+                        "Nacionalidade_id = @nacionalidade, DataNascimento = @dataNascimento WHERE ID = @id";
                 }
                 else
                 {
-                    dtr.Close();
+                    // Inserção de um novo cliente
                     sql = "INSERT INTO tblClientes (Nome, CPF, Telefone, Sexo, Nacionalidade_id, DataNascimento, DataHoraCadastro) " +
                         "VALUES (@nome, @cpf, @telefone, @sexo, @nacionalidade, @dataNascimento, @dataHoraCadastro)";
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@nome", txtNome.Text);
-                    cmd.Parameters.AddWithValue("@cpf", mskCPF.Text);
-                    cmd.Parameters.AddWithValue("@telefone", mskTelefone.Text);
-                    cmd.Parameters.AddWithValue("@sexo", lstSexo.Text);
-                    cmd.Parameters.AddWithValue("@nacionalidade", ((KeyValuePair<short, string>)lstNacionalidade.SelectedItem).Key); // Alterado para short
-
-                    // Converter a string de data de nascimento para um objeto DateTime
-                    DateTime dataNascimento;
-                    if (DateTime.TryParseExact(mskDataNascimento.Text, "ddMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataNascimento))
-                    {
-                        cmd.Parameters.AddWithValue("@dataNascimento", dataNascimento.ToString("yyyy-MM-dd"));
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Formato de data de nascimento inválido. Use o formato dd/MM/yyyy. Valor recebido: " + mskDataNascimento.Text);
-                    }
-
-                    cmd.Parameters.AddWithValue("@dataHoraCadastro", DateTime.Now);
-
-                    cmd.CommandText = sql;
-                    cmd.ExecuteNonQuery();
-
-                    MessageBox.Show("Dados cadastrados com sucesso!!", "Dados cadastrados", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    limparCampos();
-                    desabilitarCampos();
                 }
+
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@nome", txtNome.Text);
+                cmd.Parameters.AddWithValue("@cpf", mskCPF.Text);
+                cmd.Parameters.AddWithValue("@telefone", mskTelefone.Text);
+                cmd.Parameters.AddWithValue("@sexo", lstSexo.Text);
+                cmd.Parameters.AddWithValue("@nacionalidade", ((KeyValuePair<short, string>)lstNacionalidade.SelectedItem).Key);
+
+                // Converter a string de data de nascimento para um objeto DateTime
+                DateTime dataNascimento;
+                if (DateTime.TryParseExact(mskDataNascimento.Text, "ddMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataNascimento))
+                {
+                    cmd.Parameters.AddWithValue("@dataNascimento", dataNascimento.ToString("yyyy-MM-dd"));
+                }
+                else
+                {
+                    throw new ArgumentException("Formato de data de nascimento inválido. Use o formato dd/MM/yyyy. Valor recebido: " + mskDataNascimento.Text);
+                }
+
+                cmd.Parameters.AddWithValue("@dataHoraCadastro", DateTime.Now);
+
+                // Se for uma atualização, adicione o parâmetro do ID do cliente
+                if (!string.IsNullOrEmpty(txtID.Text))
+                {
+                    cmd.Parameters.AddWithValue("@id", txtID.Text);
+                }
+
+                cmd.CommandText = sql;
+                cmd.ExecuteNonQuery();
+
+                MessageBox.Show("Dados salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                limparCampos();
+                desabilitarCampos();
             }
             catch (Exception error)
             {
-                MessageBox.Show("Erro ao salvar cliente: " + error.Message);
+                MessageBox.Show("Erro ao salvar cliente: " + error.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -184,7 +190,7 @@ namespace ProjetoTesteLuiz
                     cmd.Parameters.AddWithValue("@cpf", mskCPFPesquisar.Text.Trim());
                 }
 
-                cmd.CommandText = sql;                
+                cmd.CommandText = sql;
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
@@ -199,5 +205,49 @@ namespace ProjetoTesteLuiz
                 conn.Close();
             }
         }
+
+        private void mskCPF_Leave(object sender, EventArgs e)
+        {
+            // Realiza a pesquisa automática ao sair do campo CPF
+            PesquisarClientePorCPF();
+        }
+
+        private void PesquisarClientePorCPF()
+        {
+            try
+            {
+                conn.Open();
+                string sql = "SELECT * FROM tblClientes WHERE CPF = @cpf";
+                cmd.CommandText = sql;
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("@cpf", mskCPF.Text);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    reader.Read();
+                    // Se o CPF já existir no banco, traz os dados para a tela
+                    txtNome.Text = reader["Nome"].ToString();
+                    mskTelefone.Text = reader["Telefone"].ToString();
+                    lstSexo.Text = reader["Sexo"].ToString();
+                    lstNacionalidade.Text = reader["Nacionalidade_id"].ToString();
+                    // Converte a data de nascimento para o formato dd/MM/yyyy antes de atribuí-la ao campo
+                    DateTime dataNascimento = Convert.ToDateTime(reader["DataNascimento"]);
+                    mskDataNascimento.Text = dataNascimento.ToString("ddMMyyyy");
+                    // Defina outras atribuições de campos conforme necessário
+
+                    MessageBox.Show("CPF já cadastrado. Os dados foram carregados.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao pesquisar cliente por CPF: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
     }
 }
