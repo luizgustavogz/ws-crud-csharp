@@ -1,7 +1,8 @@
 -- CREATE DATABASE testeLuiz
 USE testeLuiz
 
--- usrluiz		1234
+-- https://www.youtube.com/watch?v=zIBsTOtdwS0&ab_channel=ThiagodaSilvaAdriano
+-- user: usrluiz		senha: 1234
 
 -- 1. Criar a tabela tblClientes
 CREATE TABLE tblClientes (
@@ -40,3 +41,8 @@ INSERT INTO tblNacionalidades (Nacionalidade) VALUES ('Argentina');
 INSERT INTO tblNacionalidades (Nacionalidade) VALUES ('Espanhola');
 INSERT INTO tblNacionalidades (Nacionalidade) VALUES ('Outras');
 
+
+
+-- 6. Inserir clientes
+--INSERT INTO tblClientes (Nome, CPF, Telefone, Sexo, Nacionalidade_id, DataNascimento, DataHoraCadastro)
+--VALUES ('Luiz Gustavo', 12345678910, 11945266591, 'M', 4, GETDATE(), GETDATE())

@@ -1,22 +1,18 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 
 namespace ProjetoTesteLuiz
 {
     public partial class frmCadastroClientes : Form
     {
+        private FormDbContext dbContext;
+
         public frmCadastroClientes()
         {
             InitializeComponent();
+            dbContext = new FormDbContext(@"Data Source=LUIZ-DESKTOP\SQLEXPRESS;Initial Catalog=testeLuiz;Integrated Security=False;User ID=usrluiz;Password=1234;");
         }
-
-        SqlConnection conn = new SqlConnection(@"Data Source=LUIZ-DESKTOP\SQLEXPRESS;Integrated Security=SSPI;Initial Catalog=testeLuiz");
-        SqlCommand cmd = new SqlCommand();
-        SqlDataReader dtr;
-
         public void desabilitarCampos()
         {
             txtNome.Enabled = false;
@@ -58,32 +54,24 @@ namespace ProjetoTesteLuiz
             grClientes.DataSource = null;
             mskCPFPesquisar.Text = "";
             txtNomePesquisar.Text = "";
+            txtID.Text = "";
         }
 
         private void frmCadastroClientes_Load(object sender, EventArgs e)
         {
             try
             {
-                conn.Open();
                 string sql = "SELECT Id, Nacionalidade FROM tblNacionalidades";
-                cmd.CommandText = sql;
-                cmd.Connection = conn;
+                DataTable dataTable = dbContext.ExecuteQuery(sql);
 
-                using (dtr = cmd.ExecuteReader())
+                foreach (DataRow row in dataTable.Rows)
                 {
-                    while (dtr.Read())
-                    {
-                        lstNacionalidade.Items.Add(new KeyValuePair<short, string>((short)dtr["Id"], (string)dtr["Nacionalidade"]));
-                    }
+                    lstNacionalidade.Items.Add(new KeyValuePair<short, string>((short)row["Id"], (string)row["Nacionalidade"]));
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao carregar nacionalidades: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
             }
 
             desabilitarCampos();
@@ -111,13 +99,15 @@ namespace ProjetoTesteLuiz
         {
             try
             {
-                conn.Open();
                 string sql;
+                List<SqlParameter> parameters = new List<SqlParameter>();
+
                 if (!string.IsNullOrEmpty(txtID.Text))
                 {
                     // Atualização de um cliente existente
                     sql = "UPDATE tblClientes SET Nome = @nome, CPF = @cpf, Telefone = @telefone, Sexo = @sexo, " +
                         "Nacionalidade_id = @nacionalidade, DataNascimento = @dataNascimento WHERE ID = @id";
+                    parameters.Add(new SqlParameter("@id", txtID.Text));
                 }
                 else
                 {
@@ -126,34 +116,30 @@ namespace ProjetoTesteLuiz
                         "VALUES (@nome, @cpf, @telefone, @sexo, @nacionalidade, @dataNascimento, @dataHoraCadastro)";
                 }
 
-                cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("@nome", txtNome.Text);
-                cmd.Parameters.AddWithValue("@cpf", mskCPF.Text);
-                cmd.Parameters.AddWithValue("@telefone", mskTelefone.Text);
-                cmd.Parameters.AddWithValue("@sexo", lstSexo.Text);
-                cmd.Parameters.AddWithValue("@nacionalidade", ((KeyValuePair<short, string>)lstNacionalidade.SelectedItem).Key);
+                parameters.Add(new SqlParameter("@nome", txtNome.Text));
+                parameters.Add(new SqlParameter("@cpf", mskCPF.Text));
+                parameters.Add(new SqlParameter("@telefone", mskTelefone.Text));
+
+                // Verifica se o valor selecionado para Sexo é uma string vazia e, se for, define o valor como null
+                string sexo = lstSexo.Text == "\"\"" ? DBNull.Value.ToString() : lstSexo.Text;
+                parameters.Add(new SqlParameter("@sexo", sexo));
+
+                parameters.Add(new SqlParameter("@nacionalidade", ((KeyValuePair<short, string>)lstNacionalidade.SelectedItem).Key));
 
                 // Converter a string de data de nascimento para um objeto DateTime
                 DateTime dataNascimento;
                 if (DateTime.TryParseExact(mskDataNascimento.Text, "ddMMyyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out dataNascimento))
                 {
-                    cmd.Parameters.AddWithValue("@dataNascimento", dataNascimento.ToString("yyyy-MM-dd"));
+                    parameters.Add(new SqlParameter("@dataNascimento", dataNascimento.ToString("yyyy-MM-dd")));
                 }
                 else
                 {
                     throw new ArgumentException("Formato de data de nascimento inválido. Use o formato dd/MM/yyyy. Valor recebido: " + mskDataNascimento.Text);
                 }
 
-                cmd.Parameters.AddWithValue("@dataHoraCadastro", DateTime.Now);
+                parameters.Add(new SqlParameter("@dataHoraCadastro", DateTime.Now));
 
-                // Se for uma atualização, adicione o parâmetro do ID do cliente
-                if (!string.IsNullOrEmpty(txtID.Text))
-                {
-                    cmd.Parameters.AddWithValue("@id", txtID.Text);
-                }
-
-                cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
+                dbContext.ExecuteNonQuery(sql, parameters.ToArray());
 
                 MessageBox.Show("Dados salvos com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -164,75 +150,65 @@ namespace ProjetoTesteLuiz
             {
                 MessageBox.Show("Erro ao salvar cliente: " + error.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            finally
-            {
-                conn.Close();
-            }
         }
 
         private void cmdPesquisar_Click(object sender, EventArgs e)
         {
             cmdLimpar.Enabled = true;
+            cmdDeletar.Enabled = true;
             try
             {
-                conn.Open();
-                string sql = "SELECT * FROM tblClientes WHERE 1 = 1";
+                string sql = "SELECT * FROM vwClientes WHERE 1 = 1";
+                List<SqlParameter> parameters = new List<SqlParameter>();
+
                 if (!string.IsNullOrEmpty(txtNomePesquisar.Text))
                 {
                     sql += " AND Nome LIKE @nome";
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@nome", "%" + txtNomePesquisar.Text.Trim() + "%");
+                    parameters.Add(new SqlParameter("@nome", "%" + txtNomePesquisar.Text.Trim() + "%"));
                 }
+
                 if (!string.IsNullOrEmpty(mskCPFPesquisar.Text))
                 {
                     sql += " AND CPF = @cpf";
-                    cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("@cpf", mskCPFPesquisar.Text.Trim());
+                    parameters.Add(new SqlParameter("@cpf", mskCPFPesquisar.Text.Trim()));
                 }
 
-                cmd.CommandText = sql;
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                if (!string.IsNullOrEmpty(txtID.Text))
+                {
+                    sql += " AND ID = @id";
+                    parameters.Add(new SqlParameter("@id", txtID.Text.Trim()));
+                }
+
+                DataTable dt = dbContext.ExecuteQuery(sql, parameters.ToArray());
                 grClientes.DataSource = dt;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Erro ao pesquisar clientes: " + ex.Message);
             }
-            finally
-            {
-                conn.Close();
-            }
         }
 
         private void mskCPF_Leave(object sender, EventArgs e)
         {
-            // Realiza a pesquisa automática ao sair do campo CPF
-            PesquisarClientePorCPF();
-        }
-
-        private void PesquisarClientePorCPF()
-        {
             try
             {
-                conn.Open();
                 string sql = "SELECT * FROM tblClientes WHERE CPF = @cpf";
-                cmd.CommandText = sql;
-                cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("@cpf", mskCPF.Text);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                if (reader.HasRows)
+                SqlParameter[] parameters =
                 {
-                    reader.Read();
+                    new SqlParameter("@cpf", mskCPF.Text)
+                };
+                DataTable dt = dbContext.ExecuteQuery(sql, parameters);
+
+                if (dt.Rows.Count > 0)
+                {
+                    DataRow row = dt.Rows[0];
                     // Se o CPF já existir no banco, traz os dados para a tela
-                    txtNome.Text = reader["Nome"].ToString();
-                    mskTelefone.Text = reader["Telefone"].ToString();
-                    lstSexo.Text = reader["Sexo"].ToString();
-                    lstNacionalidade.Text = reader["Nacionalidade_id"].ToString();
+                    txtNome.Text = row["Nome"].ToString();
+                    mskTelefone.Text = row["Telefone"].ToString();
+                    lstSexo.Text = row["Sexo"].ToString();
+                    lstNacionalidade.Text = row["Nacionalidade_id"].ToString();
                     // Converte a data de nascimento para o formato dd/MM/yyyy antes de atribuí-la ao campo
-                    DateTime dataNascimento = Convert.ToDateTime(reader["DataNascimento"]);
+                    DateTime dataNascimento = Convert.ToDateTime(row["DataNascimento"]);
                     mskDataNascimento.Text = dataNascimento.ToString("ddMMyyyy");
                     // Defina outras atribuições de campos conforme necessário
 
@@ -243,11 +219,28 @@ namespace ProjetoTesteLuiz
             {
                 MessageBox.Show("Erro ao pesquisar cliente por CPF: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            finally
-            {
-                conn.Close();
-            }
         }
 
+        private void cmdDeletar_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Tem certeza que deseja remover este cliente?", "Confirmação de Remoção", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try
+                {
+                    string sql = "DELETE FROM tblClientes WHERE ID = @id";
+                    SqlParameter[] parameters = { new SqlParameter("@id", txtID.Text) };
+                    dbContext.ExecuteNonQuery(sql, parameters);
+
+                    MessageBox.Show("Cliente removido com sucesso!", "Remoção Concluída", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    limparCampos();
+                    desabilitarCampos();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao remover cliente: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
     }
 }

@@ -54,6 +54,10 @@
             cmdPesquisar = new Button();
             lstSexo = new ListBox();
             txtID = new TextBox();
+            backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            label9 = new Label();
+            label10 = new Label();
+            label11 = new Label();
             ((System.ComponentModel.ISupportInitialize)grClientes).BeginInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).BeginInit();
             SuspendLayout();
@@ -61,7 +65,7 @@
             // grClientes
             // 
             grClientes.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            grClientes.Location = new Point(12, 303);
+            grClientes.Location = new Point(12, 349);
             grClientes.Name = "grClientes";
             grClientes.RowTemplate.Height = 25;
             grClientes.Size = new Size(509, 135);
@@ -69,7 +73,7 @@
             // 
             // txtNome
             // 
-            txtNome.Location = new Point(31, 47);
+            txtNome.Location = new Point(258, 114);
             txtNome.Name = "txtNome";
             txtNome.Size = new Size(191, 23);
             txtNome.TabIndex = 1;
@@ -77,7 +81,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(31, 29);
+            label1.Location = new Point(258, 96);
             label1.Name = "label1";
             label1.Size = new Size(40, 15);
             label1.TabIndex = 2;
@@ -86,7 +90,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(250, 29);
+            label2.Location = new Point(39, 96);
             label2.Name = "label2";
             label2.Size = new Size(28, 15);
             label2.TabIndex = 4;
@@ -95,7 +99,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(31, 86);
+            label3.Location = new Point(39, 146);
             label3.Name = "label3";
             label3.Size = new Size(51, 15);
             label3.TabIndex = 6;
@@ -109,7 +113,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(250, 143);
+            label4.Location = new Point(258, 203);
             label4.Name = "label4";
             label4.Size = new Size(32, 15);
             label4.TabIndex = 8;
@@ -118,7 +122,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(250, 86);
+            label5.Location = new Point(258, 146);
             label5.Name = "label5";
             label5.Size = new Size(83, 15);
             label5.TabIndex = 10;
@@ -127,7 +131,7 @@
             // lstNacionalidade
             // 
             lstNacionalidade.FormattingEnabled = true;
-            lstNacionalidade.Location = new Point(250, 104);
+            lstNacionalidade.Location = new Point(258, 164);
             lstNacionalidade.Name = "lstNacionalidade";
             lstNacionalidade.Size = new Size(121, 23);
             lstNacionalidade.TabIndex = 9;
@@ -135,7 +139,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(31, 143);
+            label6.Location = new Point(39, 212);
             label6.Name = "label6";
             label6.Size = new Size(114, 15);
             label6.TabIndex = 12;
@@ -143,7 +147,7 @@
             // 
             // cmdSalvar
             // 
-            cmdSalvar.Location = new Point(109, 274);
+            cmdSalvar.Location = new Point(129, 44);
             cmdSalvar.Name = "cmdSalvar";
             cmdSalvar.Size = new Size(75, 23);
             cmdSalvar.TabIndex = 13;
@@ -153,7 +157,7 @@
             // 
             // cmdEditar
             // 
-            cmdEditar.Location = new Point(190, 274);
+            cmdEditar.Location = new Point(220, 44);
             cmdEditar.Name = "cmdEditar";
             cmdEditar.Size = new Size(75, 23);
             cmdEditar.TabIndex = 14;
@@ -162,17 +166,18 @@
             // 
             // cmdDeletar
             // 
-            cmdDeletar.Location = new Point(271, 274);
+            cmdDeletar.Location = new Point(457, 310);
             cmdDeletar.Name = "cmdDeletar";
-            cmdDeletar.Size = new Size(75, 23);
+            cmdDeletar.Size = new Size(72, 23);
             cmdDeletar.TabIndex = 15;
             cmdDeletar.Text = "Deletar";
             cmdDeletar.UseVisualStyleBackColor = true;
+            cmdDeletar.Click += cmdDeletar_Click;
             // 
             // mskDataNascimento
             // 
             mskDataNascimento.CutCopyMaskFormat = MaskFormat.ExcludePromptAndLiterals;
-            mskDataNascimento.Location = new Point(31, 162);
+            mskDataNascimento.Location = new Point(39, 231);
             mskDataNascimento.Mask = "00/00/0000";
             mskDataNascimento.Name = "mskDataNascimento";
             mskDataNascimento.Size = new Size(66, 23);
@@ -183,7 +188,7 @@
             // mskTelefone
             // 
             mskTelefone.CutCopyMaskFormat = MaskFormat.ExcludePromptAndLiterals;
-            mskTelefone.Location = new Point(31, 104);
+            mskTelefone.Location = new Point(39, 164);
             mskTelefone.Mask = "(99) 00000-0000";
             mskTelefone.Name = "mskTelefone";
             mskTelefone.Size = new Size(89, 23);
@@ -193,17 +198,17 @@
             // mskCPF
             // 
             mskCPF.CutCopyMaskFormat = MaskFormat.ExcludePromptAndLiterals;
-            mskCPF.Location = new Point(250, 47);
+            mskCPF.Location = new Point(39, 114);
             mskCPF.Mask = "000.000.000-00";
             mskCPF.Name = "mskCPF";
             mskCPF.Size = new Size(96, 23);
             mskCPF.TabIndex = 20;
             mskCPF.TextMaskFormat = MaskFormat.ExcludePromptAndLiterals;
-            mskCPF.Leave += new EventHandler(mskCPF_Leave);
+            mskCPF.Leave += mskCPF_Leave;
             // 
             // cmdNovo
             // 
-            cmdNovo.Location = new Point(28, 274);
+            cmdNovo.Location = new Point(39, 44);
             cmdNovo.Name = "cmdNovo";
             cmdNovo.Size = new Size(75, 23);
             cmdNovo.TabIndex = 21;
@@ -213,7 +218,7 @@
             // 
             // cmdLimpar
             // 
-            cmdLimpar.Location = new Point(352, 274);
+            cmdLimpar.Location = new Point(311, 44);
             cmdLimpar.Name = "cmdLimpar";
             cmdLimpar.Size = new Size(75, 23);
             cmdLimpar.TabIndex = 22;
@@ -223,7 +228,7 @@
             // 
             // cmdSair
             // 
-            cmdSair.Location = new Point(433, 274);
+            cmdSair.Location = new Point(401, 44);
             cmdSair.Name = "cmdSair";
             cmdSair.Size = new Size(75, 23);
             cmdSair.TabIndex = 23;
@@ -234,17 +239,17 @@
             // mskCPFPesquisar
             // 
             mskCPFPesquisar.CutCopyMaskFormat = MaskFormat.ExcludePromptAndLiterals;
-            mskCPFPesquisar.Location = new Point(65, 217);
+            mskCPFPesquisar.Location = new Point(124, 305);
             mskCPFPesquisar.Mask = "000.000.000-00";
             mskCPFPesquisar.Name = "mskCPFPesquisar";
-            mskCPFPesquisar.Size = new Size(96, 23);
+            mskCPFPesquisar.Size = new Size(80, 23);
             mskCPFPesquisar.TabIndex = 25;
             mskCPFPesquisar.TextMaskFormat = MaskFormat.ExcludePromptAndLiterals;
             // 
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new Point(31, 222);
+            label7.Location = new Point(90, 310);
             label7.Name = "label7";
             label7.Size = new Size(28, 15);
             label7.TabIndex = 24;
@@ -253,7 +258,7 @@
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(182, 222);
+            label8.Location = new Point(210, 310);
             label8.Name = "label8";
             label8.Size = new Size(40, 15);
             label8.TabIndex = 27;
@@ -261,16 +266,16 @@
             // 
             // txtNomePesquisar
             // 
-            txtNomePesquisar.Location = new Point(228, 219);
+            txtNomePesquisar.Location = new Point(256, 307);
             txtNomePesquisar.Name = "txtNomePesquisar";
-            txtNomePesquisar.Size = new Size(143, 23);
+            txtNomePesquisar.Size = new Size(114, 23);
             txtNomePesquisar.TabIndex = 26;
             // 
             // cmdPesquisar
             // 
-            cmdPesquisar.Location = new Point(377, 222);
+            cmdPesquisar.Location = new Point(376, 310);
             cmdPesquisar.Name = "cmdPesquisar";
-            cmdPesquisar.Size = new Size(75, 23);
+            cmdPesquisar.Size = new Size(73, 23);
             cmdPesquisar.TabIndex = 28;
             cmdPesquisar.Text = "Pesquisar";
             cmdPesquisar.UseVisualStyleBackColor = true;
@@ -282,8 +287,8 @@
             lstSexo.DisplayMember = "adasd";
             lstSexo.FormattingEnabled = true;
             lstSexo.ItemHeight = 15;
-            lstSexo.Items.AddRange(new object[] { "\"M\"", "\"F\"", "\"\"" });
-            lstSexo.Location = new Point(250, 161);
+            lstSexo.Items.AddRange(new object[] { "M", "F", "\"\"" });
+            lstSexo.Location = new Point(258, 221);
             lstSexo.Name = "lstSexo";
             lstSexo.Size = new Size(58, 49);
             lstSexo.TabIndex = 29;
@@ -291,17 +296,45 @@
             // 
             // txtID
             // 
-            txtID.Location = new Point(377, 47);
+            txtID.Location = new Point(39, 305);
             txtID.Name = "txtID";
-            txtID.Size = new Size(100, 23);
+            txtID.Size = new Size(41, 23);
             txtID.TabIndex = 30;
-            txtID.Visible = false;
+            // 
+            // label9
+            // 
+            label9.Location = new Point(0, 0);
+            label9.Name = "label9";
+            label9.Size = new Size(100, 23);
+            label9.TabIndex = 32;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            label10.Location = new Point(39, 9);
+            label10.Name = "label10";
+            label10.Size = new Size(77, 25);
+            label10.TabIndex = 31;
+            label10.Text = "Opções";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new Point(15, 313);
+            label11.Name = "label11";
+            label11.Size = new Size(18, 15);
+            label11.TabIndex = 33;
+            label11.Text = "ID";
             // 
             // frmCadastroClientes
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(533, 450);
+            ClientSize = new Size(533, 500);
+            Controls.Add(label11);
+            Controls.Add(label10);
+            Controls.Add(label9);
             Controls.Add(txtID);
             Controls.Add(lstSexo);
             Controls.Add(cmdPesquisar);
@@ -328,7 +361,7 @@
             Controls.Add(txtNome);
             Controls.Add(grClientes);
             Name = "frmCadastroClientes";
-            Text = "Cadastro Clientes";
+            Text = "Formulário de Clientes";
             Load += frmCadastroClientes_Load;
             ((System.ComponentModel.ISupportInitialize)grClientes).EndInit();
             ((System.ComponentModel.ISupportInitialize)fileSystemWatcher1).EndInit();
@@ -364,5 +397,9 @@
         private Label label7;
         private ListBox lstSexo;
         private TextBox txtID;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private Label label9;
+        private Label label10;
+        private Label label11;
     }
 }
