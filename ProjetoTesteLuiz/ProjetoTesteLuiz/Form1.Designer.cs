@@ -70,6 +70,7 @@
             grClientes.RowTemplate.Height = 25;
             grClientes.Size = new Size(509, 135);
             grClientes.TabIndex = 0;
+            grClientes.SelectionChanged += grClientes_SelectionChanged;
             // 
             // txtNome
             // 
@@ -163,6 +164,7 @@
             cmdEditar.TabIndex = 11;
             cmdEditar.Text = "Editar";
             cmdEditar.UseVisualStyleBackColor = true;
+            cmdEditar.Click += cmdEditar_Click;
             // 
             // cmdDeletar
             // 

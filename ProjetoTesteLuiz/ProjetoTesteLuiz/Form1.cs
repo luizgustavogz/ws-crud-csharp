@@ -13,7 +13,8 @@ namespace ProjetoTesteLuiz
             InitializeComponent();
             dbContext = new FormDbContext(@"Data Source=LUIZ-DESKTOP\SQLEXPRESS;Initial Catalog=testeLuiz;Integrated Security=False;User ID=usrluiz;Password=1234;");
         }
-        public void desabilitarCampos()
+
+        private void desabilitarCampos()
         {
             txtNome.Enabled = false;
             lstSexo.Enabled = false;
@@ -28,7 +29,7 @@ namespace ProjetoTesteLuiz
             cmdNovo.Enabled = true;
         }
 
-        public void habilitarCampos()
+        private void habilitarCampos()
         {
             txtNome.Enabled = true;
             lstSexo.Enabled = true;
@@ -43,7 +44,7 @@ namespace ProjetoTesteLuiz
             cmdNovo.Enabled = false;
         }
 
-        public void limparCampos()
+        private void limparCampos()
         {
             txtNome.Text = "";
             lstSexo.Text = "";
@@ -55,6 +56,23 @@ namespace ProjetoTesteLuiz
             mskCPFPesquisar.Text = "";
             txtNomePesquisar.Text = "";
             txtID.Text = "";
+        }
+
+        private void AtualizarGrid()
+        {
+            try
+            {
+                // Consulta o banco de dados para obter todos os clientes
+                string sql = "SELECT * FROM vwClientes";
+                DataTable dt = dbContext.ExecuteQuery(sql);
+
+                // Atualiza o DataSource do grid com os novos dados
+                grClientes.DataSource = dt;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao atualizar o grid: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void frmCadastroClientes_Load(object sender, EventArgs e)
@@ -74,7 +92,58 @@ namespace ProjetoTesteLuiz
                 MessageBox.Show("Erro ao carregar nacionalidades: " + ex.Message);
             }
 
+            AtualizarGrid();
             desabilitarCampos();
+        }
+
+        private void grClientes_SelectionChanged(object sender, EventArgs e)
+        {
+            // Verifica se há uma linha selecionada no grid
+            if (grClientes.SelectedRows.Count > 0)
+            {
+                // Obtém o ID do cliente selecionado na grade
+                string clienteID = grClientes.SelectedRows[0].Cells["ID"].Value.ToString();
+
+                // Consulta o banco de dados para obter os detalhes do cliente com base no ID
+                string sql = "SELECT * FROM tblClientes WHERE ID = @id";
+                SqlParameter parameter = new SqlParameter("@id", clienteID);
+
+                try
+                {
+                    DataTable dt = dbContext.ExecuteQuery(sql, new SqlParameter[] { parameter });
+
+                    // Verifica se foram encontrados dados para o cliente com o ID fornecido
+                    if (dt.Rows.Count > 0)
+                    {
+                        DataRow row = dt.Rows[0];
+                        habilitarCampos();
+
+                        // Preenche os campos de entrada com os detalhes do cliente
+                        txtID.Text = row["ID"].ToString();
+                        txtNome.Text = row["Nome"].ToString();
+                        mskCPF.Text = row["CPF"].ToString();
+                        mskTelefone.Text = row["Telefone"].ToString();
+
+                        // Verifica se o valor do sexo no banco de dados é NULL
+                        string sexo = row["Sexo"] != DBNull.Value.ToString() ? row["Sexo"].ToString() : "\"\"";
+                        lstSexo.SelectedItem = sexo;
+
+                        lstNacionalidade.Text = row["Nacionalidade_id"].ToString();
+
+                        // Converte a data de nascimento para o formato esperado e a define no campo correspondente
+                        DateTime dataNascimento = Convert.ToDateTime(row["DataNascimento"]);
+                        mskDataNascimento.Text = dataNascimento.ToString("ddMMyyyy");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Cliente não encontrado.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao recuperar dados do cliente: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void cmdNovo_Click(object sender, EventArgs e)
@@ -99,6 +168,7 @@ namespace ProjetoTesteLuiz
         {
             try
             {
+                AtualizarGrid();
                 string sql;
                 List<SqlParameter> parameters = new List<SqlParameter>();
 
@@ -227,6 +297,7 @@ namespace ProjetoTesteLuiz
             {
                 try
                 {
+                    AtualizarGrid();
                     string sql = "DELETE FROM tblClientes WHERE ID = @id";
                     SqlParameter[] parameters = { new SqlParameter("@id", txtID.Text) };
                     dbContext.ExecuteNonQuery(sql, parameters);
@@ -241,6 +312,11 @@ namespace ProjetoTesteLuiz
                     MessageBox.Show("Erro ao remover cliente: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void cmdEditar_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
