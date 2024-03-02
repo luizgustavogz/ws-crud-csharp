@@ -24,7 +24,6 @@ namespace ProjetoTesteLuiz
             lstNacionalidade.Enabled = false;
             cmdSalvar.Enabled = false;
             cmdDeletar.Enabled = false;
-            cmdEditar.Enabled = false;
             cmdLimpar.Enabled = false;
             cmdNovo.Enabled = true;
         }
@@ -39,7 +38,6 @@ namespace ProjetoTesteLuiz
             lstNacionalidade.Enabled = true;
             cmdSalvar.Enabled = true;
             cmdDeletar.Enabled = true;
-            cmdEditar.Enabled = true;
             cmdLimpar.Enabled = true;
             cmdNovo.Enabled = false;
         }
@@ -79,12 +77,12 @@ namespace ProjetoTesteLuiz
         {
             try
             {
-                string sql = "SELECT Id, Nacionalidade FROM tblNacionalidades";
+                string sql = "SELECT Nacionalidade FROM tblNacionalidades";
                 DataTable dataTable = dbContext.ExecuteQuery(sql);
 
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    lstNacionalidade.Items.Add(new KeyValuePair<short, string>((short)row["Id"], (string)row["Nacionalidade"]));
+                    lstNacionalidade.Items.Add(row["Nacionalidade"].ToString());
                 }
             }
             catch (Exception ex)
@@ -105,7 +103,10 @@ namespace ProjetoTesteLuiz
                 string clienteID = grClientes.SelectedRows[0].Cells["ID"].Value.ToString();
 
                 // Consulta o banco de dados para obter os detalhes do cliente com base no ID
-                string sql = "SELECT * FROM tblClientes WHERE ID = @id";
+                string sql = @"SELECT c.*, n.Nacionalidade
+                               FROM tblClientes c
+                               INNER JOIN tblNacionalidades n ON c.Nacionalidade_id = n.Id
+                               WHERE c.ID = @id";
                 SqlParameter parameter = new SqlParameter("@id", clienteID);
 
                 try
@@ -128,7 +129,7 @@ namespace ProjetoTesteLuiz
                         string sexo = row["Sexo"] != DBNull.Value.ToString() ? row["Sexo"].ToString() : "\"\"";
                         lstSexo.SelectedItem = sexo;
 
-                        lstNacionalidade.Text = row["Nacionalidade_id"].ToString();
+                        lstNacionalidade.Text = row["Nacionalidade"].ToString();
 
                         // Converte a data de nascimento para o formato esperado e a define no campo correspondente
                         DateTime dataNascimento = Convert.ToDateTime(row["DataNascimento"]);
@@ -194,7 +195,12 @@ namespace ProjetoTesteLuiz
                 string sexo = lstSexo.Text == "\"\"" ? DBNull.Value.ToString() : lstSexo.Text;
                 parameters.Add(new SqlParameter("@sexo", sexo));
 
-                parameters.Add(new SqlParameter("@nacionalidade", ((KeyValuePair<short, string>)lstNacionalidade.SelectedItem).Key));
+                if (lstNacionalidade.SelectedItem != null)
+                {
+                    string nacionalidadeSelecionada = lstNacionalidade.SelectedItem.ToString();
+                    short nacionalidadeId = ObterIdNacionalidade(nacionalidadeSelecionada); // Função para obter o ID com base no nome da nacionalidade
+                    parameters.Add(new SqlParameter("@nacionalidade", nacionalidadeId));
+                }
 
                 // Converter a string de data de nascimento para um objeto DateTime
                 DateTime dataNascimento;
@@ -314,9 +320,20 @@ namespace ProjetoTesteLuiz
             }
         }
 
-        private void cmdEditar_Click(object sender, EventArgs e)
+        private short ObterIdNacionalidade(string nacionalidade)
         {
-
+            try
+            {
+                string sql = "SELECT Id FROM tblNacionalidades WHERE Nacionalidade = @nacionalidade";
+                SqlParameter parameter = new SqlParameter("@nacionalidade", nacionalidade);
+                object result = dbContext.ExecuteScalar(sql, parameter);
+                return result != null ? (short)result : (short)0; // Retornar o ID da nacionalidade ou 0 se não for encontrado
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erro ao obter o ID da nacionalidade: " + ex.Message);
+                return 0; // Retorna 0 em caso de erro
+            }
         }
     }
 }

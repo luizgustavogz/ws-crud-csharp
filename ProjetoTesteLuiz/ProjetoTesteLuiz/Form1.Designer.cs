@@ -39,7 +39,6 @@
             lstNacionalidade = new ComboBox();
             label6 = new Label();
             cmdSalvar = new Button();
-            cmdEditar = new Button();
             cmdDeletar = new Button();
             mskDataNascimento = new MaskedTextBox();
             mskTelefone = new MaskedTextBox();
@@ -156,16 +155,6 @@
             cmdSalvar.UseVisualStyleBackColor = true;
             cmdSalvar.Click += cmdSalvar_Click;
             // 
-            // cmdEditar
-            // 
-            cmdEditar.Location = new Point(220, 44);
-            cmdEditar.Name = "cmdEditar";
-            cmdEditar.Size = new Size(75, 23);
-            cmdEditar.TabIndex = 11;
-            cmdEditar.Text = "Editar";
-            cmdEditar.UseVisualStyleBackColor = true;
-            cmdEditar.Click += cmdEditar_Click;
-            // 
             // cmdDeletar
             // 
             cmdDeletar.Location = new Point(457, 310);
@@ -220,7 +209,7 @@
             // 
             // cmdLimpar
             // 
-            cmdLimpar.Location = new Point(311, 44);
+            cmdLimpar.Location = new Point(215, 44);
             cmdLimpar.Name = "cmdLimpar";
             cmdLimpar.Size = new Size(75, 23);
             cmdLimpar.TabIndex = 12;
@@ -230,7 +219,7 @@
             // 
             // cmdSair
             // 
-            cmdSair.Location = new Point(401, 44);
+            cmdSair.Location = new Point(304, 44);
             cmdSair.Name = "cmdSair";
             cmdSair.Size = new Size(75, 23);
             cmdSair.TabIndex = 13;
@@ -351,7 +340,6 @@
             Controls.Add(mskTelefone);
             Controls.Add(mskDataNascimento);
             Controls.Add(cmdDeletar);
-            Controls.Add(cmdEditar);
             Controls.Add(cmdSalvar);
             Controls.Add(label6);
             Controls.Add(label5);
@@ -384,7 +372,6 @@
         private ComboBox lstNacionalidade;
         private Label label4;
         private Button cmdDeletar;
-        private Button cmdEditar;
         private Button cmdSalvar;
         private MaskedTextBox mskDataNascimento;
         private Button cmdNovo;

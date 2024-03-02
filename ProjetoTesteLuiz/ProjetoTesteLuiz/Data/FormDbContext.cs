@@ -86,6 +86,23 @@ namespace ProjetoTesteLuiz
             }
         }
 
+        public object ExecuteScalar(string sql, params SqlParameter[] parameters)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    connection.Open();
+                    if (parameters != null)
+                    {
+                        command.Parameters.AddRange(parameters);
+                    }
+                    return command.ExecuteScalar();
+                }
+            }
+        }
+
+
         public void Dispose()
         {
             CloseConnection();
