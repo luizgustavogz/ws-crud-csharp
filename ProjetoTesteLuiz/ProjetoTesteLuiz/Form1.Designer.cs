@@ -76,7 +76,7 @@
             txtNome.Location = new Point(258, 114);
             txtNome.Name = "txtNome";
             txtNome.Size = new Size(191, 23);
-            txtNome.TabIndex = 1;
+            txtNome.TabIndex = 2;
             // 
             // label1
             // 
@@ -134,7 +134,7 @@
             lstNacionalidade.Location = new Point(258, 164);
             lstNacionalidade.Name = "lstNacionalidade";
             lstNacionalidade.Size = new Size(121, 23);
-            lstNacionalidade.TabIndex = 9;
+            lstNacionalidade.TabIndex = 4;
             // 
             // label6
             // 
@@ -150,7 +150,7 @@
             cmdSalvar.Location = new Point(129, 44);
             cmdSalvar.Name = "cmdSalvar";
             cmdSalvar.Size = new Size(75, 23);
-            cmdSalvar.TabIndex = 13;
+            cmdSalvar.TabIndex = 10;
             cmdSalvar.Text = "Salvar";
             cmdSalvar.UseVisualStyleBackColor = true;
             cmdSalvar.Click += cmdSalvar_Click;
@@ -160,7 +160,7 @@
             cmdEditar.Location = new Point(220, 44);
             cmdEditar.Name = "cmdEditar";
             cmdEditar.Size = new Size(75, 23);
-            cmdEditar.TabIndex = 14;
+            cmdEditar.TabIndex = 11;
             cmdEditar.Text = "Editar";
             cmdEditar.UseVisualStyleBackColor = true;
             // 
@@ -181,7 +181,7 @@
             mskDataNascimento.Mask = "00/00/0000";
             mskDataNascimento.Name = "mskDataNascimento";
             mskDataNascimento.Size = new Size(66, 23);
-            mskDataNascimento.TabIndex = 18;
+            mskDataNascimento.TabIndex = 5;
             mskDataNascimento.TextMaskFormat = MaskFormat.ExcludePromptAndLiterals;
             mskDataNascimento.ValidatingType = typeof(DateTime);
             // 
@@ -192,7 +192,7 @@
             mskTelefone.Mask = "(99) 00000-0000";
             mskTelefone.Name = "mskTelefone";
             mskTelefone.Size = new Size(89, 23);
-            mskTelefone.TabIndex = 19;
+            mskTelefone.TabIndex = 3;
             mskTelefone.TextMaskFormat = MaskFormat.ExcludePromptAndLiterals;
             // 
             // mskCPF
@@ -202,7 +202,7 @@
             mskCPF.Mask = "000.000.000-00";
             mskCPF.Name = "mskCPF";
             mskCPF.Size = new Size(96, 23);
-            mskCPF.TabIndex = 20;
+            mskCPF.TabIndex = 1;
             mskCPF.TextMaskFormat = MaskFormat.ExcludePromptAndLiterals;
             mskCPF.Leave += mskCPF_Leave;
             // 
@@ -221,7 +221,7 @@
             cmdLimpar.Location = new Point(311, 44);
             cmdLimpar.Name = "cmdLimpar";
             cmdLimpar.Size = new Size(75, 23);
-            cmdLimpar.TabIndex = 22;
+            cmdLimpar.TabIndex = 12;
             cmdLimpar.Text = "Limpar";
             cmdLimpar.UseVisualStyleBackColor = true;
             cmdLimpar.Click += cmdLimpar_Click;
@@ -231,7 +231,7 @@
             cmdSair.Location = new Point(401, 44);
             cmdSair.Name = "cmdSair";
             cmdSair.Size = new Size(75, 23);
-            cmdSair.TabIndex = 23;
+            cmdSair.TabIndex = 13;
             cmdSair.Text = "Sair";
             cmdSair.UseVisualStyleBackColor = true;
             cmdSair.Click += cmdSair_Click;
@@ -243,7 +243,7 @@
             mskCPFPesquisar.Mask = "000.000.000-00";
             mskCPFPesquisar.Name = "mskCPFPesquisar";
             mskCPFPesquisar.Size = new Size(80, 23);
-            mskCPFPesquisar.TabIndex = 25;
+            mskCPFPesquisar.TabIndex = 8;
             mskCPFPesquisar.TextMaskFormat = MaskFormat.ExcludePromptAndLiterals;
             // 
             // label7
@@ -269,14 +269,14 @@
             txtNomePesquisar.Location = new Point(256, 307);
             txtNomePesquisar.Name = "txtNomePesquisar";
             txtNomePesquisar.Size = new Size(114, 23);
-            txtNomePesquisar.TabIndex = 26;
+            txtNomePesquisar.TabIndex = 9;
             // 
             // cmdPesquisar
             // 
             cmdPesquisar.Location = new Point(376, 310);
             cmdPesquisar.Name = "cmdPesquisar";
             cmdPesquisar.Size = new Size(73, 23);
-            cmdPesquisar.TabIndex = 28;
+            cmdPesquisar.TabIndex = 14;
             cmdPesquisar.Text = "Pesquisar";
             cmdPesquisar.UseVisualStyleBackColor = true;
             cmdPesquisar.Click += cmdPesquisar_Click;
@@ -291,7 +291,7 @@
             lstSexo.Location = new Point(258, 221);
             lstSexo.Name = "lstSexo";
             lstSexo.Size = new Size(58, 49);
-            lstSexo.TabIndex = 29;
+            lstSexo.TabIndex = 6;
             lstSexo.ValueMember = "sdadsa";
             // 
             // txtID
@@ -299,7 +299,7 @@
             txtID.Location = new Point(39, 305);
             txtID.Name = "txtID";
             txtID.Size = new Size(41, 23);
-            txtID.TabIndex = 30;
+            txtID.TabIndex = 7;
             // 
             // label9
             // 
