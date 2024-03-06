@@ -126,6 +126,7 @@ namespace ProjetoTesteLuiz
                 if (txtNome.Text.Any(char.IsDigit))
                 {
                     MessageBox.Show("O campo de nome não pode conter números.", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    txtNome.Focus();
                     return;
                 }
 
